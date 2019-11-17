@@ -37,9 +37,10 @@
         <TableRow>
 
             <Button
-                android:id="@+id/login"
+                android:id="@+id/bLogin"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
+                android:onClick="login"
                 android:text="LOGIN" />
         </TableRow>
         <TableRow>
@@ -49,6 +50,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:gravity="center"
+                android:onClick="Registrar"
                 android:text="Registrar" />
         </TableRow>
     </TableLayout>

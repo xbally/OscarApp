@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".cadastro_registro">
     <TableLayout
         android:layout_width="320dp"
         android:layout_height="520dp"
@@ -40,9 +41,9 @@
 
         <TableRow>
 
-        <TextView
-            android:text="Confima Senha"
-            />
+            <TextView
+                android:text="Confima Senha"
+                />
 
         </TableRow>
         <TableRow>
@@ -59,6 +60,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:gravity="center"
+                android:onClick="Cadastro"
                 android:text="Registrar" />
         </TableRow>
     </TableLayout>
