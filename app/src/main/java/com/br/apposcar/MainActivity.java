@@ -1,12 +1,14 @@
 package com.br.apposcar;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,12 +20,16 @@ import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity  extends AppCompatActivity {
-    public static final String REQUEST_TAG = "MainVolleyActivity";
+public class MainActivity  extends AppCompatActivity implements Response.Listener,Response.ErrorListener, View.OnClickListener {
+    public static final String REQUEST_TAG = "UserAutentication";
     private EditText login;
-    private EditText senha;
+    private EditText password;
     private Button lButton;
+    private Usuario usu;
+    private Intent intent;
+    private ProgressDialog pDialog;
     private RequestQueue mQueue;
+    String usuarioTxt,senha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,86 +37,35 @@ public class MainActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         login = (EditText) findViewById(R.id.email);
-        senha = (EditText) findViewById(R.id.senha);
+        password = (EditText) findViewById(R.id.senha);
         lButton = (Button) findViewById(R.id.bLogin);
     }
 
-    public void login(View v) {
+    public void login() {
         mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
-        String url = "http://192.168.15.5:8083/OscarServidor/UserServlet";
-        try {
-            JSONObject postparams = new JSONObject();
-            postparams.put("login", login.getText().toString());
-            postparams.put("password", senha.getText().toString());
-            final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method
-                    .POST, url,
-                    postparams, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        String login = ((JSONObject) response).getString("login");
+        //  String url = "http://192.168.15.5:8083/OscarServidor/UserServlet";
 
-                        if ( login == null || login.equals("false") ) {
-                            String message = ((JSONObject) response).getString("message");
-                            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                            alertDialog.setTitle("Erro ao logar");
-                            alertDialog.setMessage(message);
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        } else {
-                            String name = ((JSONObject) response).getString("name");
-                            Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
-                            intent.putExtra("nameUser", name);
-                            startActivity(intent);
-                        }
+        final Response.Listener<JSONObject> list = this;
+        final Response.ErrorListener errorListener = this;
 
-                    } catch ( JSONException e) {
-                        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                        alertDialog.setTitle("Erro transformar JSON");
-                        alertDialog.setMessage(e.getMessage());
-                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                    alertDialog.setTitle("Erro da requisição");
-                    alertDialog.setMessage(error.getMessage());
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
+        usuarioTxt = login.getText().toString();
+        senha = password.getText().toString();
+        if (usuarioTxt.isEmpty()) {
+            Toast.makeText(this, "Usuário em branco!", Toast.LENGTH_LONG).show();
+        } else if (senha.isEmpty()) {
+            Toast.makeText(this, "Senha em branco!", Toast.LENGTH_LONG).show();
+        } else {
+            String url = "http://192.168.15.5:8083/OscarAppServer/UserValidator?login=" + usuarioTxt + "&senha=" + senha;
+
+            final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method.POST, url, new JSONObject(), list, errorListener);
             jsonRequest.setTag(REQUEST_TAG);
+
             mQueue.add(jsonRequest);
-        } catch ( JSONException e ) {
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle("Erro do JSON");
-            alertDialog.setMessage(e.getMessage());
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            pDialog = new ProgressDialog(this);
+            pDialog.setMessage("Login em progresso...");
+            pDialog.setCanceledOnTouchOutside(false);
+            pDialog.show();
         }
     }
 
@@ -118,6 +73,38 @@ public class MainActivity  extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), Registrar.class);
         startActivity(intent);
     }
+
+    @Override
+    public void onClick(View v) {
+        login();
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResponse(Object response) {
+        String responseWs = ("Resposta: " + response);
+        System.out.println(responseWs);
+        pDialog.dismiss();
+        try{
+            if ( (((JSONObject) response).getString("message")).equals("Login correto")){
+                intent = new Intent(MainActivity.this,DashboardActivity.class);
+                DbConnector db = new DbConnector(MainActivity.this);
+                db.open();
+                usu = db.autenticaLogin(usuarioTxt,senha);
+                intent.putExtra("usuario",usu);
+                startActivity(intent);
+            }else
+                Toast.makeText(this,"Login incorreto",Toast.LENGTH_LONG).show();
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -131,4 +118,6 @@ public class MainActivity  extends AppCompatActivity {
             mQueue.cancelAll(REQUEST_TAG);
         }
     }
+
+
 }
