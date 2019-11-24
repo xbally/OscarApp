@@ -1,15 +1,9 @@
 package com.br.apposcar;
 
-/**
- * Created by Amanda on 10/06/2017.
- */
 
 
 import java.io.Serializable;
 
-/**
- * Created by Ricardo on 17/11/2016.
- */
 
 public class Usuario implements Serializable {
     private String nome;

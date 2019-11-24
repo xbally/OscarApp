@@ -1,10 +1,5 @@
 package com.br.apposcar;
 
-/**
- * Created by Amanda on 10/06/2017.
- */
-
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.StrictMode;
