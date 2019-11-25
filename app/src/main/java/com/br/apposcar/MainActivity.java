@@ -88,12 +88,13 @@ public class MainActivity  extends AppCompatActivity implements Response.Listene
         String responseWs = ("Resposta: " + response);
         System.out.println(responseWs);
         pDialog.dismiss();
+        JSONObject responseJson = (JSONObject) response;
         try{
-            if ( (((JSONObject) response).getString("message")).equals("Login correto")){
+            if ( (((JSONObject) response).getString("message")).equalsIgnoreCase("Login correto")){
                 intent = new Intent(MainActivity.this,DashboardActivity.class);
-                DbConnector db = new DbConnector(MainActivity.this);
-                db.open();
-                usu = db.autenticaLogin(usuarioTxt,senha);
+                usu = new Usuario(responseJson.getString("nome"), responseJson.getString("senha"), responseJson.getString("filme")
+                        , responseJson.getString("diretor"), responseJson.getInt("usuario")
+                        , responseJson.getInt("votou"), responseJson.getInt("token"));
                 intent.putExtra("usuario",usu);
                 startActivity(intent);
             }else

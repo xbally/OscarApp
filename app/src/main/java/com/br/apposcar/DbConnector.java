@@ -64,10 +64,13 @@ public class DbConnector {
         Cursor result = database.query("Usuario", new String[]{"*,count(*)"},"nome='"+nome+"' and senha='"+senha+"'",null,null,null,null);
         result.moveToFirst();
         Usuario usuario1 = new Usuario(
-                result.getString(result.getColumnIndex("nome")),
-                result.getString(result.getColumnIndex("senha")),
-                result.getInt(result.getColumnIndex("usuario")),
-                result.getInt(result.getColumnIndex("votou"))
+                result.getString(result.getColumnIndex("nome"))
+                , result.getString(result.getColumnIndex("senha"))
+                , result.getString(result.getColumnIndex("filme"))
+                , result.getString(result.getColumnIndex("diretor"))
+                , result.getInt(result.getColumnIndex("usuario"))
+                , result.getInt(result.getColumnIndex("votou"))
+                , result.getInt(result.getColumnIndex("token"))
         );
         return usuario1;
     }
@@ -77,10 +80,13 @@ public class DbConnector {
                 null);
         result.moveToFirst();
         Usuario usuario1 = new Usuario(
-                result.getString(result.getColumnIndex("nome")),
-                result.getString(result.getColumnIndex("senha")),
-                result.getInt(result.getColumnIndex("usuario")),
-                result.getInt(result.getColumnIndex("votou"))
+                result.getString(result.getColumnIndex("nome"))
+                , result.getString(result.getColumnIndex("senha"))
+                , result.getString(result.getColumnIndex("filme"))
+                , result.getString(result.getColumnIndex("diretor"))
+                , result.getInt(result.getColumnIndex("usuario"))
+                , result.getInt(result.getColumnIndex("votou"))
+                , result.getInt(result.getColumnIndex("token"))
         );
         return usuario1;
     }

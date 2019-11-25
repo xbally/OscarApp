@@ -39,7 +39,6 @@ public class Registrar extends AppCompatActivity {
 
     }
 
-
     public void registrar(View v){
         mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
