@@ -39,11 +39,10 @@ public class Registrar extends AppCompatActivity {
 
     }
 
-
     public void registrar(View v){
         mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
-        String url = "http://192.168.15.5:8083/OscarServidor/CadastroServlet";
+        String url = getString(R.string.server_path) + "/CadastroServlet";
         String name = edtName.getText().toString();
         String email = edtEmail.getText().toString();
         String senha= edtSenha.getText().toString();

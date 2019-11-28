@@ -94,7 +94,7 @@ public class ConfirmarVoto extends AppCompatActivity implements Response.Listene
 
         if (usuario.getVotou()!=1){
 
-            String url = "http://192.168.15.5:8030/OscarAppServer/ConfirmaVoto?nome=" + usuario.getNome() +
+            String url = getString(R.string.server_path) + "ConfirmaVoto?nome=" + usuario.getNome() +
                     "&filme=" + filme.getNome() + "&diretor=" + diretor.getNome();
 
             final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method.POST, url, new JSONObject(),

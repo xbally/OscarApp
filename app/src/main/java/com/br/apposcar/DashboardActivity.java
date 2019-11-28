@@ -21,7 +21,7 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        TextView tvBoasVindas = (TextView) findViewById(R.id.tvBoasVindas);
+        TextView tvToken = (TextView) findViewById(R.id.token);
 
         intent = getIntent();
         if (intent != null) {
@@ -35,7 +35,7 @@ public class DashboardActivity extends AppCompatActivity {
                     diretor = (Diretor) bundle.getSerializable("diretor");
 
                 if (usuario !=null){
-                    tvBoasVindas.setText("Bem-vindo(a) "+ usuario.getNome());
+                    tvToken.setText("TOKEN: "+ usuario.getToken());
                 }
 
                 if (diretor != null)
@@ -67,8 +67,6 @@ public class DashboardActivity extends AppCompatActivity {
     public void confirmaVoto(View view){
         intent = new Intent(DashboardActivity.this, ConfirmarVoto.class);
         intent.putExtra("usuario",usuario);
-        intent.putExtra("filme",filme);
-        intent.putExtra("diretor",diretor);
         startActivity(intent);
     }
 

@@ -44,7 +44,6 @@ public class MainActivity  extends AppCompatActivity implements Response.Listene
     public void login() {
         mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
-        //  String url = "http://192.168.15.5:8083/OscarServidor/UserServlet";
 
         final Response.Listener<JSONObject> list = this;
         final Response.ErrorListener errorListener = this;
@@ -56,7 +55,7 @@ public class MainActivity  extends AppCompatActivity implements Response.Listene
         } else if (senha.isEmpty()) {
             Toast.makeText(this, "Senha em branco!", Toast.LENGTH_LONG).show();
         } else {
-            String url = "http://192.168.15.5:8083/OscarAppServer/UserValidator?login=" + usuarioTxt + "&senha=" + senha;
+            String url = getString(R.string.server_path) + "UserValidator?login=" + usuarioTxt + "&senha=" + senha;
 
             final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method.POST, url, new JSONObject(), list, errorListener);
             jsonRequest.setTag(REQUEST_TAG);
@@ -89,12 +88,13 @@ public class MainActivity  extends AppCompatActivity implements Response.Listene
         String responseWs = ("Resposta: " + response);
         System.out.println(responseWs);
         pDialog.dismiss();
+        JSONObject responseJson = (JSONObject) response;
         try{
-            if ( (((JSONObject) response).getString("message")).equals("Login correto")){
+            if ( (((JSONObject) response).getString("message")).equalsIgnoreCase("Login correto")){
                 intent = new Intent(MainActivity.this,DashboardActivity.class);
-                DbConnector db = new DbConnector(MainActivity.this);
-                db.open();
-                usu = db.autenticaLogin(usuarioTxt,senha);
+                usu = new Usuario(responseJson.getString("nome"), responseJson.getString("senha"), responseJson.getString("filme")
+                        , responseJson.getString("diretor"), responseJson.getInt("usuario")
+                        , responseJson.getInt("votou"), responseJson.getInt("token"));
                 intent.putExtra("usuario",usu);
                 startActivity(intent);
             }else
