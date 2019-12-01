@@ -54,6 +54,8 @@ public class DetalhesCandidato extends AppCompatActivity {
             }
         }
 
+//        if(usuario != null && usuario.getVotou()) MUDAR O "VOTOU" PARA BOOLEANO
+        //Esconder/Mostrar botão
         btnVotar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -30,9 +30,6 @@ public class VotarFilmes extends AppCompatActivity {
     private Usuario usuario;
     private Intent intent;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +45,6 @@ public class VotarFilmes extends AppCompatActivity {
                 tipoVotacao = "filme";
             }
         }
-
 
         url = "https://dl.dropboxusercontent.com/s/luags6sv8uxdoj1/filme.json";
         lv = (ListView) findViewById(R.id.list);
@@ -71,7 +67,6 @@ public class VotarFilmes extends AppCompatActivity {
             }
         });
     }
-
 
     public class GetTeams extends AsyncTask<Void, Void, Bitmap> {
                 @Override
@@ -126,7 +121,6 @@ public class VotarFilmes extends AppCompatActivity {
                     }
                     return imagemBitmap;
                 }
-
 
                 @Override
                 protected void onPostExecute(Bitmap aVoid) {

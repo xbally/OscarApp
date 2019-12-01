@@ -25,7 +25,6 @@ public class Registrar extends AppCompatActivity {
     private EditText edtEmail;
     private EditText edtSenha;
     private EditText edtConfiSenha;
-    String nameUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +34,6 @@ public class Registrar extends AppCompatActivity {
         edtEmail= (EditText) findViewById(R.id.email);
         edtSenha= (EditText) findViewById(R.id.senha);
         edtConfiSenha= (EditText) findViewById(R.id.Confirsenha);
-
-
     }
 
     public void registrar(View v){
