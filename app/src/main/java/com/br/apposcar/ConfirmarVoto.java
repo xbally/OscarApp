@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,18 +33,17 @@ public class ConfirmarVoto extends AppCompatActivity implements Response.Listene
     private TextView tvNomeFilme,tvGeneroFilme, tvNomeDiretor,tvGeneroDiretor;
     private ImageView fotoFilme;
     private Button btnAlterarVoto, btnConfirmarVoto;
+    private EditText edToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_confirmar_voto);
+        setContentView(R.layout.activity_confirmar_voto_teste);
         tvNomeFilme = (TextView) findViewById(R.id.textViewNomeFilme);
         tvNomeDiretor = (TextView) findViewById(R.id.textViewNomeDiretor);
         tvGeneroFilme = (TextView) findViewById(R.id.textViewGeneroFilme);
-
-
+        edToken = (EditText)findViewById(R.id.token); 
         fotoFilme = (ImageView) findViewById(R.id.imageViewFilme);
-
         btnAlterarVoto = (Button) findViewById(R.id.btnAlterarVoto);
         btnConfirmarVoto = (Button) findViewById(R.id.btnConfirmarVoto);
         btnConfirmarVoto.setOnClickListener(this);
@@ -72,7 +72,6 @@ public class ConfirmarVoto extends AppCompatActivity implements Response.Listene
         btnAlterarVoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 intent = new Intent(ConfirmarVoto.this,DashboardActivity.class);
                 intent.putExtra("usuario",usuario);
                 intent.putExtra("filme",filme);
@@ -95,7 +94,7 @@ public class ConfirmarVoto extends AppCompatActivity implements Response.Listene
         if (usuario.getVotou()!=1){
 
             String url = getString(R.string.server_path) + "ConfirmaVoto?nome=" + usuario.getNome() +
-                    "&filme=" + filme.getNome() + "&diretor=" + diretor.getNome();
+                    "&filme=" + filme.getNome() + "&diretor=" + diretor.getNome() + "&token=" + edToken.getText().toString() ;
 
             final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method.POST, url, new JSONObject(),
                     list, errorListener);
@@ -133,7 +132,9 @@ public class ConfirmarVoto extends AppCompatActivity implements Response.Listene
            //     intent = new Intent(ConfirmarVoto.this,FinalActivity.class);
                 startActivity(intent);
             }else if((((JSONObject) response).getString("message")).equals("Usuario ja votou")){
-                Toast.makeText(this,"Você ja votou, não pode mais...",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Voto já realizado.",Toast.LENGTH_LONG).show();
+            }else if((((JSONObject) response).getString("message")).equals("Token incorreto")){
+                Toast.makeText(this,"Token incorreto. Tente novamente.",Toast.LENGTH_LONG).show();
             }else
                 Toast.makeText(this,"Falha ao registrar voto.",Toast.LENGTH_LONG).show();
         } catch (JSONException e){
