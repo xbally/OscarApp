@@ -2,9 +2,6 @@ package com.br.apposcar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -18,118 +15,84 @@ import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Registrar extends AppCompatActivity {
+public class Registrar extends AppCompatActivity implements Response.Listener,Response.ErrorListener, View.OnClickListener {
     public static final String REQUEST_TAG = "Registrar";
     private RequestQueue mQueue;
     private EditText edtName;
-    private EditText edtEmail;
     private EditText edtSenha;
-    private EditText edtConfiSenha;
+    private EditText edtConfirmaSenha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar);
         edtName = (EditText) findViewById(R.id.name);
-        edtEmail= (EditText) findViewById(R.id.email);
-        edtSenha= (EditText) findViewById(R.id.senha);
-        edtConfiSenha= (EditText) findViewById(R.id.Confirsenha);
+        edtSenha = (EditText) findViewById(R.id.senha);
+        edtConfirmaSenha = (EditText) findViewById(R.id.Confirsenha);
     }
 
-    public void registrar(View v){
-        mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
-                .getRequestQueue();
-        String url = getString(R.string.server_path) + "/CadastroServlet";
-        String name = edtName.getText().toString();
-        String email = edtEmail.getText().toString();
+    public void registrar(){
+        mQueue = CustomVolleyRequestQueue.getInstance(this.getApplicationContext()).getRequestQueue();
+        final Response.Listener<JSONObject> list = this;
+        final Response.ErrorListener errorListener = this;
+
+        String usuarioTxt = edtName.getText().toString();
         String senha= edtSenha.getText().toString();
-        String confirmaSenha = edtConfiSenha.getText().toString();
-        if ( name == null || name.equals("") ) {
-            Toast.makeText(this, "Por favor, preencha o nome", Toast.LENGTH_LONG).show();
-        } else if ( email == null || senha.equals("") || confirmaSenha.equals("") ) {
-            Toast.makeText(this, "Por favor, preenche os campos", Toast.LENGTH_LONG).show();
-        } else  {
-            try {
-                JSONObject postparams = new JSONObject();
-                postparams.put("name", name);
-                postparams.put("email", email);
-                postparams.put("senha", senha);
-                final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method
-                        .POST, url,
-                        postparams, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String insert = ((JSONObject) response).getString("insert");
-                            String message = ((JSONObject) response).getString("message");
+        String confirmaSenha= edtConfirmaSenha.getText().toString();
+        
+        if (usuarioTxt.isEmpty()) {
+            Toast.makeText(this, "Usuário em branco!", Toast.LENGTH_LONG).show();
+        } else if (senha.isEmpty()) {
+            Toast.makeText(this, "Senha em branco!", Toast.LENGTH_LONG).show();
+        } else if(!senha.equals(confirmaSenha)) {
+            Toast.makeText(this, "Senha não foi confirmada corretamente.", Toast.LENGTH_LONG).show();
+        } else {
+            String url = getString(R.string.server_path) + "Cadastro?login=" + usuarioTxt + "&senha=" + senha;
 
-                            if ( insert == null || insert.equals("false") ) {
-                                AlertDialog alertDialog = new AlertDialog.Builder(Registrar.this).create();
-                                alertDialog.setTitle("Erro ao inserir");
-                                alertDialog.setMessage(message);
-                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            } else {
-                                AlertDialog alertDialog = new AlertDialog.Builder(Registrar.this).create();
-                                alertDialog.setTitle("Sucesso ao inserir");
-                                alertDialog.setMessage(message);
-                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                finish();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
+            final CustomJSONObjectRequest jsonRequest = new CustomJSONObjectRequest(Request.Method.POST, url, new JSONObject(), list, errorListener);
+            jsonRequest.setTag(REQUEST_TAG);
+        }
+    }
 
-                        } catch ( JSONException e) {
-                            AlertDialog alertDialog = new AlertDialog.Builder(Registrar.this).create();
-                            alertDialog.setTitle("Erro transformar JSON");
-                            alertDialog.setMessage(e.getMessage());
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        AlertDialog alertDialog = new AlertDialog.Builder(Registrar.this).create();
-                        alertDialog.setTitle("Erro da requisição");
-                        alertDialog.setMessage(error.getMessage());
-                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
-                jsonRequest.setTag(REQUEST_TAG);
-                mQueue.add(jsonRequest);
-            } catch ( JSONException e ) {
-                AlertDialog alertDialog = new AlertDialog.Builder(Registrar.this).create();
-                alertDialog.setTitle("Erro do JSON");
-                alertDialog.setMessage(e.getMessage());
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Fechar",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+    @Override
+    public void onClick(View v) {
+        registrar();
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResponse(Object response) {
+        try {
+            String msg = (((JSONObject) response).getString("message"));
+            if (msg == null || msg.isEmpty()) {
+                Toast.makeText(this, "Erro ao cadastrar usuário.", Toast.LENGTH_LONG).show();
+            } else if(msg.equalsIgnoreCase("Login existente")) {
+                Toast.makeText(this,"Login já existente. Favor escolher outro.",Toast.LENGTH_LONG).show();
+            }else {
+                Toast.makeText(this,"Cadastro realizado com sucesso.",Toast.LENGTH_LONG).show();
             }
+        } catch (JSONException e){
+            Toast.makeText(this, "Erro ao cadastrar usuário.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if ( mQueue != null ) {
+            mQueue.cancelAll(REQUEST_TAG);
         }
     }
 }
