@@ -81,6 +81,7 @@ public class MainActivity  extends AppCompatActivity implements Response.Listene
     @Override
     public void onErrorResponse(VolleyError error) {
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+        pDialog.dismiss();
     }
 
     @Override
